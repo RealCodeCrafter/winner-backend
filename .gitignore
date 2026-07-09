@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+*.log
+
+uploads/*
+!uploads/category/
+!uploads/category/.gitkeep
+!uploads/product/
+!uploads/product/.gitkeep
