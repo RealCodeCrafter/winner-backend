@@ -57,7 +57,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = config.get<number>('PORT', 3000);
+  const port = config.get<number>('PORT', 10006);
   await app.listen(port);
 
   console.log(`Winner API: ${config.get('APP_URL', `http://localhost:${port}`)}/api`);
