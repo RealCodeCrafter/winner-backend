@@ -35,9 +35,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'winner_db'),
         autoLoadEntities: true,
-        synchronize:
-          config.get<string>('NODE_ENV', 'development') !== 'production' &&
-          config.get<string>('DB_SYNCHRONIZE', 'true') === 'true',
+        synchronize: config.get<string>('DB_SYNCHRONIZE', 'false') === 'true',
         extra: {
           max: config.get<number>('DB_POOL_MAX', 10),
           idleTimeoutMillis: 30000,
