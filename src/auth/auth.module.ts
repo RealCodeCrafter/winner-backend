@@ -7,7 +7,6 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { Superadmin } from './entities/superadmin.entity';
-import { SuperadminSeeder } from './superadmin.seeder';
 
 @Module({
   imports: [
@@ -25,7 +24,7 @@ import { SuperadminSeeder } from './superadmin.seeder';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, SuperadminSeeder],
+  providers: [AuthService, JwtStrategy],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
