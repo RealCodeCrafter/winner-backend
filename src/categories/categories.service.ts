@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
+import { Product } from '../products/entities/product.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { UploadCleanupService } from '../upload/upload-cleanup.service';
@@ -22,15 +23,26 @@ export class CategoriesService {
   ) {}
 
   async findAll() {
-    const categories = await this.categoryRepository.find({
-      order: { sortOrder: 'ASC', id: 'ASC' },
-    });
+    const categories = await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.products', 'product')
+      .orderBy('category.sortOrder', 'ASC')
+      .addOrderBy('category.id', 'ASC')
+      .addOrderBy('product.sortOrder', 'ASC')
+      .addOrderBy('product.id', 'ASC')
+      .getMany();
 
     return categories.map((item) => this.withImageUrls(item));
   }
 
   async findOne(id: number) {
-    const category = await this.categoryRepository.findOne({ where: { id } });
+    const category = await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.products', 'product')
+      .where('category.id = :id', { id })
+      .orderBy('product.sortOrder', 'ASC')
+      .addOrderBy('product.id', 'ASC')
+      .getOne();
 
     if (!category) {
       throw new NotFoundException('Kategoriya topilmadi');
@@ -96,9 +108,23 @@ export class CategoriesService {
   }
 
   private withImageUrls(category: Category) {
+    const products = (category.products ?? []).map((product) =>
+      this.mapProduct(product),
+    );
+
     return {
       ...category,
       images: this.imageUrlService.toFullUrls(category.images),
+      products,
+    };
+  }
+
+  private mapProduct(product: Product) {
+    const { category: _category, ...rest } = product;
+
+    return {
+      ...rest,
+      images: this.imageUrlService.toFullUrls(product.images),
     };
   }
 
