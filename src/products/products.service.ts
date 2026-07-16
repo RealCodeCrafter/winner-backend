@@ -93,6 +93,7 @@ export class ProductsService {
       flashPoint: dto.flashPoint ?? null,
       pourPoint: dto.pourPoint ?? null,
       baseNumber: dto.baseNumber ?? null,
+      specifications: dto.specifications ?? null,
       categoryId: dto.categoryId,
       sortOrder: dto.sortOrder ?? 0,
       images: this.imageUrlService.normalizeForStorage(dto.images) ?? [],

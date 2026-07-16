@@ -7,6 +7,7 @@ export const PRODUCT_SPEC_FIELDS = [
   'flashPoint',
   'pourPoint',
   'baseNumber',
+  'specifications',
 ] as const;
 
 export type ProductSpecField = (typeof PRODUCT_SPEC_FIELDS)[number];

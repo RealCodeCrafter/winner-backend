@@ -68,6 +68,11 @@ export class CreateProductDto {
   @IsString({ each: true })
   baseNumber?: string[];
 
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  specifications?: string[];
+
   @IsInt()
   @Min(1)
   categoryId: number;

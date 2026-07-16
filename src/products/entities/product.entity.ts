@@ -49,6 +49,9 @@ export class Product {
   @Column('text', { array: true, nullable: true })
   baseNumber: string[] | null;
 
+  @Column('text', { array: true, nullable: true })
+  specifications: string[] | null;
+
   @Column()
   categoryId: number;
 
