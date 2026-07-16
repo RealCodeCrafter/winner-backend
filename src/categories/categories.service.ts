@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
 import { Product } from '../products/entities/product.entity';
+import { PRODUCT_SPEC_FIELDS } from '../products/constants/product-spec.fields';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { UploadCleanupService } from '../upload/upload-cleanup.service';
@@ -120,12 +121,22 @@ export class CategoriesService {
   }
 
   private mapProduct(product: Product) {
-    const { category: _category, ...rest } = product;
-
-    return {
-      ...rest,
+    const response: Record<string, unknown> = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      volumes: product.volumes,
       images: this.imageUrlService.toFullUrls(product.images),
     };
+
+    for (const field of PRODUCT_SPEC_FIELDS) {
+      response[field] = product[field];
+    }
+
+    response.categoryId = product.categoryId;
+    response.sortOrder = product.sortOrder;
+
+    return response;
   }
 
   private normalizeRequiredLocalized(text: LocalizedInput): LocalizedText {

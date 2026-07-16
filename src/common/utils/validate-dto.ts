@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { PRODUCT_SPEC_FIELDS } from '../../products/constants/product-spec.fields';
 
 export async function validateDto<T extends object>(
   cls: new () => T,
@@ -36,12 +37,35 @@ export function parseCommaList(value?: string): string[] | undefined {
   return items;
 }
 
-const PRODUCT_LOCALIZED_FIELDS = [
-  'name',
-  'tag',
-  'description',
-  'manufacturedIn',
-] as const;
+const PRODUCT_LOCALIZED_FIELDS = ['name', 'description'] as const;
+
+function parseSpecArray(value?: string): string[] | undefined {
+  if (value === undefined || value.trim() === '') {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+
+  if (trimmed.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(trimmed) as unknown;
+
+      if (!Array.isArray(parsed)) {
+        throw new Error();
+      }
+
+      return parsed.map((item) => String(item).trim()).filter(Boolean);
+    } catch {
+      throw new BadRequestException(
+        'Texnik maydonlar JSON array bo\'lishi kerak, masalan: ["5W-40", "SAE J 300"]',
+      );
+    }
+  }
+
+  const items = parseCommaList(trimmed);
+
+  return items?.length ? items : undefined;
+}
 
 function parseLocalizedField(
   body: Record<string, string>,
@@ -76,16 +100,11 @@ export function parseProductFormBody(body: Record<string, string>) {
     data.volumes = parseCommaList(body.volumes);
   }
 
-  if (body.viscosity !== undefined && body.viscosity !== '') {
-    data.viscosity = body.viscosity;
-  }
-
-  if (body.apiStandard !== undefined && body.apiStandard !== '') {
-    data.apiStandard = body.apiStandard;
-  }
-
-  if (body.aceaStandard !== undefined && body.aceaStandard !== '') {
-    data.aceaStandard = body.aceaStandard;
+  for (const field of PRODUCT_SPEC_FIELDS) {
+    const value = parseSpecArray(body[field]);
+    if (value !== undefined) {
+      data[field] = value;
+    }
   }
 
   if (body.categoryId !== undefined && body.categoryId !== '') {

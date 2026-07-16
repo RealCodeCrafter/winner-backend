@@ -9,6 +9,7 @@ import { ProductQueryDto } from './dto/product-query.dto';
 import { UploadCleanupService } from '../upload/upload-cleanup.service';
 import { ImageUrlService } from '../upload/image-url.service';
 import { LocalizedText } from '../common/types/localized-text.type';
+import { PRODUCT_SPEC_FIELDS } from './constants/product-spec.fields';
 
 type CreateProductInput = CreateProductDto & { images: string[] };
 type UpdateProductInput = UpdateProductDto & { images?: string[] };
@@ -82,13 +83,16 @@ export class ProductsService {
 
     const product = this.productRepository.create({
       name,
-      tag: this.normalizeLocalized(dto.tag),
       description: this.normalizeLocalized(dto.description),
-      manufacturedIn: this.normalizeLocalized(dto.manufacturedIn),
       volumes: dto.volumes ?? [],
-      viscosity: dto.viscosity,
-      apiStandard: dto.apiStandard,
-      aceaStandard: dto.aceaStandard,
+      viscosityClass: dto.viscosityClass ?? null,
+      densityAt15C: dto.densityAt15C ?? null,
+      kinematicViscosityAt40C: dto.kinematicViscosityAt40C ?? null,
+      kinematicViscosityAt100C: dto.kinematicViscosityAt100C ?? null,
+      viscosityIndex: dto.viscosityIndex ?? null,
+      flashPoint: dto.flashPoint ?? null,
+      pourPoint: dto.pourPoint ?? null,
+      baseNumber: dto.baseNumber ?? null,
       categoryId: dto.categoryId,
       sortOrder: dto.sortOrder ?? 0,
       images: this.imageUrlService.normalizeForStorage(dto.images) ?? [],
@@ -102,9 +106,7 @@ export class ProductsService {
     const {
       images,
       name,
-      tag,
       description,
-      manufacturedIn,
       categoryId,
       ...fields
     } = dto;
@@ -121,19 +123,8 @@ export class ProductsService {
       updateData.name = nextName;
     }
 
-    if (tag !== undefined) {
-      updateData.tag = this.mergeLocalized(product.tag, tag);
-    }
-
     if (description !== undefined) {
       updateData.description = this.mergeLocalized(product.description, description);
-    }
-
-    if (manufacturedIn !== undefined) {
-      updateData.manufacturedIn = this.mergeLocalized(
-        product.manufacturedIn,
-        manufacturedIn,
-      );
     }
 
     if (images !== undefined) {
@@ -156,18 +147,35 @@ export class ProductsService {
   }
 
   private withImageUrls(product: Product) {
-    const { category, ...rest } = product;
+    return this.formatProduct(product, true);
+  }
 
-    return {
-      ...rest,
+  formatProduct(product: Product, includeCategory = false) {
+    const response: Record<string, unknown> = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      volumes: product.volumes,
       images: this.imageUrlService.toFullUrls(product.images),
-      category: category
-        ? {
-            ...category,
-            images: this.imageUrlService.toFullUrls(category.images),
-          }
-        : undefined,
     };
+
+    for (const field of PRODUCT_SPEC_FIELDS) {
+      response[field] = product[field];
+    }
+
+    response.categoryId = product.categoryId;
+    response.sortOrder = product.sortOrder;
+
+    if (includeCategory && product.category) {
+      response.category = {
+        id: product.category.id,
+        title: product.category.title,
+        images: this.imageUrlService.toFullUrls(product.category.images),
+        sortOrder: product.category.sortOrder,
+      };
+    }
+
+    return response;
   }
 
   private normalizeRequiredLocalized(text: LocalizedInput): LocalizedText {

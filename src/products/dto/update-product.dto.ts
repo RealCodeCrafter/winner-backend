@@ -8,17 +8,13 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { OptionalLocalizedTextDto } from '../../common/dto/localized-text.dto';
+import { PRODUCT_SPEC_FIELDS } from '../constants/product-spec.fields';
 
 export class UpdateProductDto {
   @ValidateNested()
   @Type(() => OptionalLocalizedTextDto)
   @IsOptional()
   name?: OptionalLocalizedTextDto;
-
-  @ValidateNested()
-  @Type(() => OptionalLocalizedTextDto)
-  @IsOptional()
-  tag?: OptionalLocalizedTextDto;
 
   @ValidateNested()
   @Type(() => OptionalLocalizedTextDto)
@@ -30,22 +26,45 @@ export class UpdateProductDto {
   @IsOptional()
   volumes?: string[];
 
-  @IsString()
   @IsOptional()
-  viscosity?: string;
+  @IsArray()
+  @IsString({ each: true })
+  viscosityClass?: string[];
 
-  @IsString()
   @IsOptional()
-  apiStandard?: string;
+  @IsArray()
+  @IsString({ each: true })
+  densityAt15C?: string[];
 
-  @IsString()
   @IsOptional()
-  aceaStandard?: string;
+  @IsArray()
+  @IsString({ each: true })
+  kinematicViscosityAt40C?: string[];
 
-  @ValidateNested()
-  @Type(() => OptionalLocalizedTextDto)
   @IsOptional()
-  manufacturedIn?: OptionalLocalizedTextDto;
+  @IsArray()
+  @IsString({ each: true })
+  kinematicViscosityAt100C?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  viscosityIndex?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  flashPoint?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  pourPoint?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  baseNumber?: string[];
 
   @IsInt()
   @Min(1)
@@ -57,3 +76,5 @@ export class UpdateProductDto {
   @IsOptional()
   sortOrder?: number;
 }
+
+export { PRODUCT_SPEC_FIELDS };

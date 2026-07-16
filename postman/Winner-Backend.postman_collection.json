@@ -1,0 +1,552 @@
+{
+  "info": {
+    "_postman_id": "winner-backend-api-collection",
+    "name": "Winner Backend API",
+    "description": "Winner lubricants backend API\n\nBase URL: https://backend.winnerlub.uz/api\n\n1. Avval **Auth → Login** ni ishga tushiring — token avtomatik saqlanadi\n2. Category/Product yaratishda **form-data** ishlatiladi\n3. Texnik maydonlar JSON array: istalgancha qiymat, masalan [\"5W-40\"] yoki [\"5W-40\", \"SAE J 300\"]",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://backend.winnerlub.uz/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": "1"
+    },
+    {
+      "key": "productId",
+      "value": "1"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.accessToken) {",
+                  "        pm.collectionVariables.set('token', json.accessToken);",
+                  "        console.log('Token saqlandi');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"winner_admin\",\n  \"password\": \"your-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Superadmin login. Javobdagi `accessToken` avtomatik `{{token}}` ga saqlanadi."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Superadmin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"winner_admin\",\n  \"currentPassword\": \"your-current-password\",\n  \"newPassword\": \"your-new-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "update"]
+            },
+            "description": "Superadmin username yoki parolini yangilash. Bearer token talab qilinadi."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Barcha kategoriyalar + ularga bog'langan productlar."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category By ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}"]
+            },
+            "description": "Bitta kategoriya + unga tegishli productlar."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title_en",
+                  "value": "Engine Oils",
+                  "type": "text"
+                },
+                {
+                  "key": "title_ru",
+                  "value": "Моторные масла",
+                  "type": "text"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Yangi kategoriya yaratish. Kamida 1 ta rasm majburiy."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title_en",
+                  "value": "Engine Oils",
+                  "type": "text"
+                },
+                {
+                  "key": "title_ru",
+                  "value": "Моторные масла",
+                  "type": "text"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}"]
+            },
+            "description": "Kategoriyani yangilash. Rasm yuborilmasa, faqat matn maydonlari yangilanadi."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}"]
+            },
+            "description": "Kategoriyani o'chirish."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?categoryId={{categoryId}}&volume=4L",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "{{categoryId}}",
+                  "description": "Ixtiyoriy filter"
+                },
+                {
+                  "key": "volume",
+                  "value": "4L",
+                  "description": "Ixtiyoriy filter"
+                }
+              ]
+            },
+            "description": "Barcha productlar + category. Query parametrlar ixtiyoriy."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "{{productId}}"]
+            },
+            "description": "Bitta product + unga bog'langan category."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name_en",
+                  "value": "WINNER Supera 10W-40 API SN/CF",
+                  "type": "text"
+                },
+                {
+                  "key": "name_ru",
+                  "value": "WINNER Supera 10W-40 API SN/CF",
+                  "type": "text"
+                },
+                {
+                  "key": "description_en",
+                  "value": "WINNER Supera 10W-40 API SN/CF is a high-performance motor oil.",
+                  "type": "text"
+                },
+                {
+                  "key": "description_ru",
+                  "value": "WINNER Supera 10W-40 API SN/CF - это высокопроизводительное моторное масло.",
+                  "type": "text"
+                },
+                {
+                  "key": "volumes",
+                  "value": "4L",
+                  "type": "text",
+                  "description": "Vergul bilan: 1L,4L,20L"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{categoryId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "viscosityClass",
+                  "value": "[\"5W-40\", \"SAE J 300\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "densityAt15C",
+                  "value": "[\"0.855\", \"ASTM D 1298\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "kinematicViscosityAt40C",
+                  "value": "[\"125\", \"ASTM D 445\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "kinematicViscosityAt100C",
+                  "value": "[\"15,6\", \"ASTM D 445\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "viscosityIndex",
+                  "value": "[\"132\", \"ASTM D 2270\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "flashPoint",
+                  "value": "[\"230\", \"ASTM D 92\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "pourPoint",
+                  "value": "[\"-41\", \"ASTM D 97\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "baseNumber",
+                  "value": "[\"8.85\", \"ASTM D 2896\"]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Yangi product yaratish. Texnik maydonlar JSON array — 1 yoki ko'proq qiymat."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name_en",
+                  "value": "WINNER Supera 10W-40 API SN/CF",
+                  "type": "text"
+                },
+                {
+                  "key": "name_ru",
+                  "value": "WINNER Supera 10W-40 API SN/CF",
+                  "type": "text"
+                },
+                {
+                  "key": "description_en",
+                  "value": "Updated description in English.",
+                  "type": "text"
+                },
+                {
+                  "key": "description_ru",
+                  "value": "Обновленное описание на русском.",
+                  "type": "text"
+                },
+                {
+                  "key": "volumes",
+                  "value": "4L,20L",
+                  "type": "text"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{categoryId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true
+                },
+                {
+                  "key": "viscosityClass",
+                  "value": "[\"5W-40\", \"SAE J 300\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "densityAt15C",
+                  "value": "[\"0.855\", \"ASTM D 1298\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "kinematicViscosityAt40C",
+                  "value": "[\"125\", \"ASTM D 445\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "kinematicViscosityAt100C",
+                  "value": "[\"15,6\", \"ASTM D 445\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "viscosityIndex",
+                  "value": "[\"132\", \"ASTM D 2270\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "flashPoint",
+                  "value": "[\"230\", \"ASTM D 92\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "pourPoint",
+                  "value": "[\"-41\", \"ASTM D 97\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "baseNumber",
+                  "value": "[\"8.85\", \"ASTM D 2896\"]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "{{productId}}"]
+            },
+            "description": "Productni yangilash. Rasm yuborilmasa, faqat matn maydonlari yangilanadi."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "{{productId}}"]
+            },
+            "description": "Productni o'chirish."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contact",
+      "item": [
+        {
+          "name": "Send Contact Message",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ali Valiyev\",\n  \"phone\": \"+998901234567\",\n  \"email\": \"ali@example.com\",\n  \"message\": \"Mahsulotlar haqida ma'lumot kerak.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact"]
+            },
+            "description": "Kontakt forma — email orqali yuboriladi."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

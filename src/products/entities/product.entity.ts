@@ -17,9 +17,6 @@ export class Product {
   name: LocalizedText;
 
   @Column({ type: 'jsonb', nullable: true })
-  tag: LocalizedText | null;
-
-  @Column({ type: 'jsonb', nullable: true })
   description: LocalizedText | null;
 
   @Column('text', { array: true, default: [] })
@@ -28,17 +25,29 @@ export class Product {
   @Column('text', { array: true, default: [] })
   images: string[];
 
-  @Column({ nullable: true })
-  viscosity: string;
+  @Column('text', { array: true, nullable: true })
+  viscosityClass: string[] | null;
 
-  @Column({ nullable: true })
-  apiStandard: string;
+  @Column('text', { array: true, nullable: true })
+  densityAt15C: string[] | null;
 
-  @Column({ nullable: true })
-  aceaStandard: string;
+  @Column('text', { array: true, nullable: true })
+  kinematicViscosityAt40C: string[] | null;
 
-  @Column({ type: 'jsonb', nullable: true })
-  manufacturedIn: LocalizedText | null;
+  @Column('text', { array: true, nullable: true })
+  kinematicViscosityAt100C: string[] | null;
+
+  @Column('text', { array: true, nullable: true })
+  viscosityIndex: string[] | null;
+
+  @Column('text', { array: true, nullable: true })
+  flashPoint: string[] | null;
+
+  @Column('text', { array: true, nullable: true })
+  pourPoint: string[] | null;
+
+  @Column('text', { array: true, nullable: true })
+  baseNumber: string[] | null;
 
   @Column()
   categoryId: number;
