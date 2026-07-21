@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
 type ContactEmailData = {
@@ -10,6 +10,8 @@ type ContactEmailData = {
 
 @Injectable()
 export class ContactService {
+  private readonly logger = new Logger(ContactService.name);
+
   private createTransporter() {
     const port = Number(process.env.SMTP_PORT) || 25;
     const secure = process.env.SMTP_SECURE === 'true' || port === 465;
@@ -68,14 +70,26 @@ export class ContactService {
 
       try {
         const info = await transporter.sendMail(mailOptions);
+
+        this.logger.log(
+          `Contact email muvaffaqiyatli yuborildi | to=${process.env.CONTACT_EMAIL} | messageId=${info.messageId ?? '—'} | name=${safe(data.name)} | phone=${safe(data.phone)} | replyTo=${safe(data.email)}`,
+        );
+
         transporter.close();
         return info;
       } catch (error) {
         lastError = error;
 
         if (attempt < maxAttempts) {
+          this.logger.warn(
+            `Contact email urinish ${attempt}/${maxAttempts} muvaffaqiyatsiz, qayta uriniladi...`,
+          );
           await new Promise((resolve) => setTimeout(resolve, attempt * 5000));
         } else {
+          this.logger.error(
+            `Contact email yuborilmadi | to=${process.env.CONTACT_EMAIL} | name=${safe(data.name)} | phone=${safe(data.phone)}`,
+            error instanceof Error ? error.stack : String(error),
+          );
           throw lastError ?? new Error('Email yuborilmadi');
         }
       } finally {
@@ -89,6 +103,10 @@ export class ContactService {
   }
 
   async sendEmailAsync(data: ContactEmailData) {
-    return this.sendEmail(data);
+    try {
+      await this.sendEmail(data);
+    } catch {
+      // Xato sendEmail ichida log qilingan
+    }
   }
 }

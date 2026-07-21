@@ -12,9 +12,7 @@ export class ContactController {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post()
   submit(@Body() dto: CreateContactDto) {
-    this.contactService.sendEmailAsync(dto).catch((error) => {
-      console.error('Contact email background error:', error);
-    });
+    void this.contactService.sendEmailAsync(dto);
 
     return {
       success: true,
