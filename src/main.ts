@@ -57,7 +57,6 @@ async function bootstrap() {
     prefix: '/uploads',
     maxAge: '7d',
     immutable: true,
-    acceptRanges: true,
     setHeaders: (res, filePath) => {
       if (filePath.toLowerCase().endsWith('.pdf')) {
         res.setHeader('Content-Type', 'application/pdf');
