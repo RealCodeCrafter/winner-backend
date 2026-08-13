@@ -40,7 +40,10 @@ async function bootstrap() {
     compression({
       // PDF/Word allaqachon siqilgan — gzip faqat sekinlashtiradi
       filter: (req, res) => {
-        if (req.path.startsWith('/uploads')) {
+        if (
+          req.path.startsWith('/uploads') ||
+          req.path.startsWith('/api/upload/file/')
+        ) {
           return false;
         }
 
@@ -58,9 +61,12 @@ async function bootstrap() {
     maxAge: '7d',
     immutable: true,
     setHeaders: (res, filePath) => {
+      res.setHeader('Accept-Ranges', 'bytes');
+
       if (filePath.toLowerCase().endsWith('.pdf')) {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'inline');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       }
     },
   });
