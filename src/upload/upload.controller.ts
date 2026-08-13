@@ -1,6 +1,9 @@
 import {
   BadRequestException,
   Controller,
+  Delete,
+  Get,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -12,6 +15,11 @@ import { documentMulterOptions } from './multer.config';
 @Controller('upload')
 export class UploadController {
   constructor(private readonly fileStorage: FileStorageService) {}
+
+  @Get()
+  list() {
+    return this.fileStorage.listDocumentFiles();
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('file', documentMulterOptions))
@@ -28,5 +36,10 @@ export class UploadController {
       size: file.size,
       mimeType: file.mimetype,
     };
+  }
+
+  @Delete(':filename')
+  remove(@Param('filename') filename: string) {
+    return this.fileStorage.deleteDocumentFile(filename);
   }
 }

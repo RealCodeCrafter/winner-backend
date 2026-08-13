@@ -36,7 +36,18 @@ async function bootstrap() {
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
   );
-  app.use(compression());
+  app.use(
+    compression({
+      // PDF/Word allaqachon siqilgan — gzip faqat sekinlashtiradi
+      filter: (req, res) => {
+        if (req.path.startsWith('/uploads')) {
+          return false;
+        }
+
+        return compression.filter(req, res);
+      },
+    }),
+  );
   app.use(json({ limit: '1mb' }));
   app.use(urlencoded({ extended: true, limit: '1mb' }));
 
@@ -46,6 +57,13 @@ async function bootstrap() {
     prefix: '/uploads',
     maxAge: '7d',
     immutable: true,
+    acceptRanges: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.toLowerCase().endsWith('.pdf')) {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'inline');
+      }
+    },
   });
 
   app.useGlobalPipes(
