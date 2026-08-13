@@ -11,7 +11,7 @@ import { AppModule } from './app.module';
 import { buildCorsOptions } from './common/config/cors.config';
 
 async function bootstrap() {
-  for (const folder of ['category', 'product'] as const) {
+  for (const folder of ['category', 'product', 'files'] as const) {
     const uploadsPath = join(process.cwd(), 'uploads', folder);
 
     if (!existsSync(uploadsPath)) {

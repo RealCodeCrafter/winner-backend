@@ -15,7 +15,9 @@ export class ImageUrlService {
       return null;
     }
 
-    const match = urlOrPath.match(/\/uploads\/(category|product)\/([^/?#]+)$/);
+    const match = urlOrPath.match(
+      /\/uploads\/(category|product|files)\/([^/?#]+)$/,
+    );
 
     if (!match) {
       return null;

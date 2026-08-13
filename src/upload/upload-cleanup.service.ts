@@ -59,7 +59,7 @@ export class UploadCleanupService {
       return null;
     }
 
-    const match = relative.match(/^\/uploads\/(category|product)\/(.+)$/);
+    const match = relative.match(/^\/uploads\/(category|product|files)\/(.+)$/);
 
     if (!match) {
       return null;

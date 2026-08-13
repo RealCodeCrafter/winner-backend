@@ -8,3 +8,5 @@ uploads/*
 !uploads/category/.gitkeep
 !uploads/product/
 !uploads/product/.gitkeep
+!uploads/files/
+!uploads/files/.gitkeep
