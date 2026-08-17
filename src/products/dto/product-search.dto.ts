@@ -4,7 +4,7 @@ export class ProductSearchDto {
   @IsString()
   @MinLength(1)
   @MaxLength(100)
-  q: string;
+  name: string;
 
   @IsInt()
   @Min(1)

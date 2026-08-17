@@ -52,7 +52,7 @@ export class ProductsService {
   }
 
   async search(query: ProductSearchDto) {
-    const term = query.q.trim();
+    const term = query.name.trim();
 
     if (!term) {
       return [];
