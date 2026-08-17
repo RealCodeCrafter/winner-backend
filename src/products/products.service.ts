@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
@@ -7,7 +7,6 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
 import { ProductSearchDto } from './dto/product-search.dto';
-import { ReorderProductImageDto } from './dto/reorder-product-image.dto';
 import { UploadCleanupService } from '../upload/upload-cleanup.service';
 import { ImageUrlService } from '../upload/image-url.service';
 import { LocalizedText } from '../common/types/localized-text.type';
@@ -173,39 +172,6 @@ export class ProductsService {
     }
 
     await this.productRepository.update(id, updateData);
-    return this.findOne(id);
-  }
-
-  async reorderImage(id: number, dto: ReorderProductImageDto) {
-    const product = await this.findOneRaw(id);
-    const images = [...(product.images ?? [])];
-
-    if (!images.length) {
-      throw new BadRequestException('Mahsulotda rasm yo\'q');
-    }
-
-    const targetUrl = this.imageUrlService.toFullUrl(dto.imageUrl.trim());
-    const currentIndex = images.findIndex(
-      (url) => this.imageUrlService.toFullUrl(url) === targetUrl,
-    );
-
-    if (currentIndex === -1) {
-      throw new BadRequestException('Bu rasm mahsulotda topilmadi');
-    }
-
-    if (dto.position > images.length) {
-      throw new BadRequestException(
-        `position 1 dan ${images.length} gacha bo'lishi kerak`,
-      );
-    }
-
-    const [moved] = images.splice(currentIndex, 1);
-    images.splice(dto.position - 1, 0, moved);
-
-    await this.productRepository.update(id, {
-      images: this.imageUrlService.normalizeForStorage(images) ?? images,
-    });
-
     return this.findOne(id);
   }
 
