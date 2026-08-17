@@ -18,6 +18,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
 import { ProductSearchDto } from './dto/product-search.dto';
+import { ReorderProductImageDto } from './dto/reorder-product-image.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { productMulterOptions } from '../upload/multer.config';
 import { FileStorageService } from '../upload/file-storage.service';
@@ -69,6 +70,14 @@ export class ProductsController {
     }
 
     return this.productsService.create({ ...dto, images });
+  }
+
+  @Patch(':id/images/reorder')
+  reorderImage(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ReorderProductImageDto,
+  ) {
+    return this.productsService.reorderImage(id, dto);
   }
 
   @Patch(':id')
