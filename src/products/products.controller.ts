@@ -17,6 +17,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
+import { ProductSearchDto } from './dto/product-search.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { productMulterOptions } from '../upload/multer.config';
 import { FileStorageService } from '../upload/file-storage.service';
@@ -36,6 +37,12 @@ export class ProductsController {
   @Get()
   findAll(@Query() query: ProductQueryDto) {
     return this.productsService.findAll(query);
+  }
+
+  @Public()
+  @Get('search')
+  search(@Query() query: ProductSearchDto) {
+    return this.productsService.search(query);
   }
 
   @Public()

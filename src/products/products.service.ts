@@ -6,6 +6,7 @@ import { Category } from '../categories/entities/category.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
+import { ProductSearchDto } from './dto/product-search.dto';
 import { UploadCleanupService } from '../upload/upload-cleanup.service';
 import { ImageUrlService } from '../upload/image-url.service';
 import { LocalizedText } from '../common/types/localized-text.type';
@@ -48,6 +49,42 @@ export class ProductsService {
       .leftJoinAndSelect('product.category', 'category')
       .getMany();
     return products.map((item) => this.withImageUrls(item));
+  }
+
+  async search(query: ProductSearchDto) {
+    const term = query.q.trim();
+
+    if (!term) {
+      return [];
+    }
+
+    const limit = query.limit ?? 10;
+    const pattern = `%${term.replace(/[%_]/g, '\\$&')}%`;
+
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .select([
+        'product.id',
+        'product.name',
+        'product.images',
+        'product.categoryId',
+        'product.sortOrder',
+      ])
+      .where(
+        `(product.name->>'en' ILIKE :pattern ESCAPE '\\' OR product.name->>'ru' ILIKE :pattern ESCAPE '\\')`,
+        { pattern },
+      )
+      .orderBy('product.sortOrder', 'ASC')
+      .addOrderBy('product.id', 'ASC')
+      .take(limit)
+      .getMany();
+
+    return products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      images: this.imageUrlService.toFullUrls(product.images),
+      categoryId: product.categoryId,
+    }));
   }
 
   async findOne(id: number) {
